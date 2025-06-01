@@ -1,11 +1,13 @@
 from django.db import models
+
+from service.models.merchant import Merchant
 # from service.models.merchant import Merchant
 
 
 class Template(models.Model):
-    # merchant = models.ForeignKey(
-    #     Merchant, on_delete=models.CASCADE, related_name="templates"
-    # )
+    merchant = models.ForeignKey(
+        Merchant, on_delete=models.CASCADE, related_name="templates"
+    )
     name = models.CharField(max_length=255)
     channel = models.CharField(
         max_length=50,

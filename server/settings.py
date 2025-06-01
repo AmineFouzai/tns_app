@@ -26,9 +26,11 @@ SECRET_KEY = "django-insecure-w6afz*g)wmo_f*_%-e70u2#s5*utikdec3vx)24y&^3^7-+*1m
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 # Application definition
 
 INSTALLED_APPS = [

@@ -5,12 +5,14 @@ from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from unfold.widgets import UnfoldAdminSelectWidget, UnfoldAdminTextInputWidget
 from unfold.contrib.forms.widgets import WysiwygWidget
 from django.db import models
-
+from rest_framework.authtoken.admin import TokenAdmin 
+from rest_framework.authtoken.models import Token ,TokenProxy
 
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
 from service.models import Recipient, Template, Campaign
+from service.models.merchant import Merchant
 
 
 @admin.register(Recipient)
@@ -22,7 +24,7 @@ class RecipientAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(Template)
 class TemplateAdmin(ModelAdmin):
-  formfield_overrides = {
+    formfield_overrides = {
         models.TextField: {
             "widget": WysiwygWidget,
         }
@@ -67,6 +69,7 @@ admin.site.unregister(IntervalSchedule)
 admin.site.unregister(CrontabSchedule)
 admin.site.unregister(SolarSchedule)
 admin.site.unregister(ClockedSchedule)
+admin.site.unregister(TokenProxy)
 
 
 class UnfoldTaskSelectWidget(UnfoldAdminSelectWidget, TaskSelectWidget):
@@ -83,3 +86,34 @@ class UnfoldPeriodicTaskForm(PeriodicTaskForm):
 @admin.register(PeriodicTask)
 class PeriodicTaskAdmin(BasePeriodicTaskAdmin, ModelAdmin):
     form = UnfoldPeriodicTaskForm
+
+
+
+@admin.register(Token)
+class TokenProxyAdmin(TokenAdmin,ModelAdmin):
+    pass
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.models import User, Group
+
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+from unfold.admin import ModelAdmin
+
+
+admin.site.unregister(User)
+admin.site.unregister(Group)
+
+
+@admin.register(Merchant)
+class UserAdmin(BaseUserAdmin, ModelAdmin):
+    # Forms loaded from `unfold.forms`
+    form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
+
+
+@admin.register(Group)
+class GroupAdmin(BaseGroupAdmin, ModelAdmin):
+    pass

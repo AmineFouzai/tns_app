@@ -3,13 +3,10 @@ from django_celery_beat.models import PeriodicTask, CrontabSchedule
 import json
 from datetime import datetime
 
+from service.models.merchant import Merchant
 from service.models.recipient import Recipient
 from service.models.template import Template
 from service.tasks import process_campaign
-
-# from service.models.merchant import Merchant
-# from service.models.recipient import Recipient
-# from service.models.template import Template
 
 
 class Campaign(models.Model):
@@ -29,30 +26,25 @@ class Campaign(models.Model):
         ("whatsapp", "WhatsApp"),
     ]
 
-    # merchant = models.ForeignKey(
-    #     Merchant, on_delete=models.CASCADE, related_name="campaigns"
-    # )
+    merchant = models.ForeignKey(
+        Merchant, on_delete=models.CASCADE, related_name="campaigns"
+    )
     name = models.CharField(max_length=255)
     channel = models.CharField(max_length=50, choices=CHANNEL_CHOICES)
-    templates = models.ManyToManyField(
-        Template, related_name="campaigns"
-    )  # A/B testing
+    templates = models.ManyToManyField(Template, related_name="campaigns")
     recipients = models.ManyToManyField(Recipient)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     scheduled_time = models.DateTimeField(null=True, blank=True)
     idempotency_key = models.CharField(
-        max_length=64, blank=True, null=True, unique=True 
+        max_length=64, blank=True, null=True, unique=True
     )
 
-    # Segmentation rule in JSON format (e.g., {"last_login_days_gt": 30})
     rule = models.JSONField(
         blank=True, null=True, help_text="Optional audience filter rules"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-    beat_task_name = models.CharField(
-        max_length=255, null=True, blank=True
-    )  # to track Celery Beat task name
+    beat_task_name = models.CharField(max_length=255, null=True, blank=True)
 
     def schedule_task(self):
         if not self.scheduled_time:
@@ -70,11 +62,11 @@ class Campaign(models.Model):
         task = PeriodicTask.objects.create(
             crontab=schedule,
             name=task_name,
-            task="service.process_campaign.process_campaign",  # use your app.task path
+            task="service.tasks.process_campaign",
             args=json.dumps([self.id]),
             one_off=True,
         )
-
+        task.save()
         self.beat_task_name = task_name
         self.save()
 

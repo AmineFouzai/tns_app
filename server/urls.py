@@ -2,7 +2,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from service.sites import app_admin_site
 from server import settings
 from django.urls import re_path
 from rest_framework import permissions
@@ -23,9 +22,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("admin/", app_admin_site.urls),
-    #path("/api/auth/", include("dj_rest_auth.urls")),
-    #path("accounts/", include("allauth.urls")),
+    path("admin/", admin.site.urls),
     path("", include("service.urls")),
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
