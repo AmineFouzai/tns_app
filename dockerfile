@@ -16,5 +16,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-# Entrypoint runs migrations, loads data, tests, and launches server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py loaddata seed_data.json && pytest && gunicorn server.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", " python manage.py wait_for_db && python manage.py makemigrations && python manage.py migrate && python manage.py seed_merchants.py && python manage.py seed_recipients.py && python manage.py seed_templates.py && python manage.py seed_campaigns.py && python manage.py  test && gunicorn server.wsgi:application --bind 0.0.0.0:8000"]
