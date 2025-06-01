@@ -6,17 +6,16 @@ from drf_yasg import openapi
 from django.utils.dateparse import parse_datetime
 from service.models import Campaign
 
-# --- Serializers for Swagger/Form Support ---
 
 class SendNotificationRequestSerializer(serializers.Serializer):
     campaign_id = serializers.IntegerField()
     idempotency_key = serializers.CharField()
 
+
 class ScheduleNotificationRequestSerializer(serializers.Serializer):
     campaign_id = serializers.IntegerField()
     scheduled_time = serializers.DateTimeField()
 
-# --- 1. Send Notification Immediately ---
 
 @swagger_auto_schema(
     method="post",
@@ -62,7 +61,6 @@ def send_notification(request):
         {"message": "Campaign sent", "campaign_id": campaign.id}, status=202
     )
 
-# --- 2. Schedule Notification ---
 
 @swagger_auto_schema(
     method="post",
@@ -91,13 +89,15 @@ def schedule_notification(request):
         {"message": "Campaign scheduled", "campaign_id": campaign.id}, status=202
     )
 
-# --- 3. Cancel Scheduled Notification ---
 
 @swagger_auto_schema(
     method="delete",
     manual_parameters=[
         openapi.Parameter(
-            "campaign_id", openapi.IN_PATH, description="Campaign ID", type=openapi.TYPE_INTEGER
+            "campaign_id",
+            openapi.IN_PATH,
+            description="Campaign ID",
+            type=openapi.TYPE_INTEGER,
         )
     ],
     responses={200: "Cancelled", 400: "Invalid Status", 404: "Not Found"},
@@ -122,13 +122,15 @@ def cancel_scheduled_notification(request, campaign_id):
         {"message": "Campaign cancelled", "campaign_id": campaign.id}, status=200
     )
 
-# --- 4. Get Campaign Status ---
 
 @swagger_auto_schema(
     method="get",
     manual_parameters=[
         openapi.Parameter(
-            "campaign_id", openapi.IN_PATH, description="Campaign ID", type=openapi.TYPE_INTEGER
+            "campaign_id",
+            openapi.IN_PATH,
+            description="Campaign ID",
+            type=openapi.TYPE_INTEGER,
         )
     ],
     responses={200: openapi.Response("Campaign status")},

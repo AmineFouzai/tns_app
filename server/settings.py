@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,10 +30,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 CELERY_TASK_ALWAYS_EAGER = True
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+ALLOWED_HOSTS = ["*"]
+UNFOLD_STUDIO_ALWAYS_OPEN = True
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -138,3 +145,76 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+UNFOLD = {
+    "ENVIRONMENT": (
+        ["Debug Server", "danger"] if DEBUG else ["Production Server", "success"]
+    ),
+    "SITE_URL": "https://example.com",
+    "SITE_TITLE": "Techrar - Your One-Stop Online Store",
+    "SITE_HEADER": "Admin Panel",
+    "SITE_SUBHEADER": "Manage products, orders, and customers",
+    "SITE_DROPDOWN": [
+        {
+            "icon": "storefront",
+            "title": _("View Site"),
+            "link": "https://example.com",
+        },
+        {
+            "icon": "diamond",
+            "title": _("Dashboad"),
+            "link": reverse_lazy("admin:index"),
+        },
+    ],
+    "SHOW_LANGUAGES": False,
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": _("⚙️ General"),
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+            {
+                "title": _("📢 Marketing & Branding"),
+                "collapsible": False,
+                "items": [
+                  
+                    {
+                        "title": _("Merchants"),
+                        "icon": "store",
+                        "link": reverse_lazy("admin:service_merchant_changelist"),
+                    },
+                       {
+                        "title": _("Recipient"),
+                        "icon": "draw_abstract",
+                        "link": reverse_lazy("admin:service_recipient_changelist"),
+                    },
+                    {
+                        "title": _("Template"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:service_template_changelist"),
+                    },
+                    {
+                        "title": _("Campaigns"),
+                        "icon": "campaign",
+                        "link": reverse_lazy("admin:service_campaign_changelist"),
+                    },
+                    {
+                        "title": _("Campaign Status"),
+                        "icon": "monitoring",
+                        "link": "/admin/django_celery_beat/periodictask/",
+                    },
+                 
+                ],
+            },
+        ],
+    },
+}

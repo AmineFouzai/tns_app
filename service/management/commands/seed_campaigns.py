@@ -1,8 +1,10 @@
 from django.core.management.base import BaseCommand
-from django.utils.timezone import now, timedelta
+from django.utils.timezone import now
+from datetime import timedelta
 from service.models.campaign import Campaign
 from service.models.template import Template
 from service.models.recipient import Recipient
+from service.models.merchant import Merchant
 import random
 import string
 
@@ -13,10 +15,17 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         templates = list(Template.objects.all())
         recipients = list(Recipient.objects.all())
+        merchants = list(Merchant.objects.all())
 
         if not templates or not recipients:
             self.stdout.write(
                 self.style.ERROR("Templates or Recipients not found. Seed them first.")
+            )
+            return
+
+        if not merchants:
+            self.stdout.write(
+                self.style.ERROR("No merchants found. Seed merchants first.")
             )
             return
 
@@ -48,6 +57,8 @@ class Command(BaseCommand):
         ]
 
         for data in sample_campaigns:
+            merchant = random.choice(merchants)
+
             campaign, created = Campaign.objects.get_or_create(
                 name=data["name"],
                 defaults={
@@ -56,13 +67,12 @@ class Command(BaseCommand):
                     "scheduled_time": data["scheduled_time"],
                     "rule": data["rule"],
                     "idempotency_key": generate_idempotency_key(),
+                    "merchant": merchant,
                 },
             )
 
-            # Link recipients (first 5)
             campaign.recipients.set(recipients[:5])
 
-            # Link templates matching channel and variant
             matched_templates = [
                 t
                 for t in templates
@@ -71,12 +81,11 @@ class Command(BaseCommand):
             ]
             campaign.templates.set(matched_templates)
 
-            # Schedule task if scheduled_time is present
-            if data["scheduled_time"]:
+            if data["scheduled_time"] and hasattr(campaign, "schedule_task"):
                 campaign.schedule_task()
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"{'Created' if created else 'Updated'} campaign: {campaign.name}"
+                    f"{'Created' if created else 'Updated'} campaign: {campaign.name} (Merchant: {merchant.username})"
                 )
             )

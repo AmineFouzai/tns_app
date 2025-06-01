@@ -1,0 +1,6 @@
+id,merchant,name,email,phone,device_token,last_login,is_active_user,custom_tags,uploaded_at
+5,11,Jennifer Johnson,delacruzallison@example.net,+1-264-243-7489x842,6ded5d4f-b1e1-44a2-89c7-94d3fa307a8f,2025-05-17 09:02:14,0,"{""interests"": [""hard"", ""a"", ""case""]}",2025-06-01 16:37:10
+4,9,Adam Miles,omurphy@example.org,+1-311-774-7067x0348,c174f54f-3493-4c50-bc44-93c89c65f66b,2025-05-24 01:49:53,0,"{""interests"": [""forward""]}",2025-06-01 16:37:10
+3,9,Tammy Bell,sara12@example.net,431-772-5775,63b32b92-7e82-4feb-b123-e20f5eff9c0d,2025-05-05 15:39:35,0,"{""interests"": [""area"", ""understand"", ""alone""]}",2025-06-01 16:37:10
+2,11,Lisa Scott,jonathantorres@example.net,231-828-7254x87080,d6b7de30-b0c2-4ed0-ad6a-f7e4dda641d9,2025-05-28 22:26:18,0,"{""interests"": [""small""]}",2025-06-01 16:37:10
+1,7,Stephanie Powell,tsmith@example.com,(889)940-6711x077,5e5fd4ec-23e2-401d-ab82-bf1056cc5743,2025-05-04 12:52:18,0,"{""interests"": [""later""]}",2025-06-01 16:37:10

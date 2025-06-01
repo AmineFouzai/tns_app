@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from service.models.recipient import Recipient
+from service.models.merchant import Merchant  # Adjust to your app structure
 from faker import Faker
 import random
 from django.utils import timezone
@@ -8,18 +9,23 @@ fake = Faker()
 
 
 class Command(BaseCommand):
-    help = "Seed the Recipient table with dummy data"
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--count", type=int, default=10, help="Number of recipients to create"
-        )
 
     def handle(self, *args, **options):
-        count = options["count"]
+        count = 5
         created = 0
 
+        merchants = list(Merchant.objects.all())
+
+        if not merchants:
+            self.stdout.write(
+                self.style.ERROR("No merchants found. Seed merchants first.")
+            )
+            return
+
         for _ in range(count):
+            merchant = random.choice(merchants)
+
             recipient = Recipient.objects.create(
                 name=fake.name(),
                 email=fake.unique.email(),
@@ -30,6 +36,7 @@ class Command(BaseCommand):
                 ),
                 is_active_user=random.choice([True, False]),
                 custom_tags={"interests": fake.words(nb=random.randint(1, 3))},
+                merchant=merchant,  # Assumes Recipient has a FK to User/Merchant
             )
             created += 1
 

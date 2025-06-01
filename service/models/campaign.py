@@ -27,7 +27,7 @@ class Campaign(models.Model):
     ]
 
     merchant = models.ForeignKey(
-        Merchant, on_delete=models.CASCADE, related_name="campaigns"
+        Merchant, on_delete=models.CASCADE, related_name="campaigns", default=None
     )
     name = models.CharField(max_length=255)
     channel = models.CharField(max_length=50, choices=CHANNEL_CHOICES)
@@ -50,7 +50,7 @@ class Campaign(models.Model):
         if not self.scheduled_time:
             return
 
-        schedule, created = CrontabSchedule.objects.get_or_create(
+        schedule, _ = CrontabSchedule.objects.get_or_create(
             minute=str(self.scheduled_time.minute),
             hour=str(self.scheduled_time.hour),
             day_of_month=str(self.scheduled_time.day),

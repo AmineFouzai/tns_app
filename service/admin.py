@@ -5,14 +5,40 @@ from unfold.contrib.import_export.forms import ExportForm, ImportForm
 from unfold.widgets import UnfoldAdminSelectWidget, UnfoldAdminTextInputWidget
 from unfold.contrib.forms.widgets import WysiwygWidget
 from django.db import models
-from rest_framework.authtoken.admin import TokenAdmin 
-from rest_framework.authtoken.models import Token ,TokenProxy
+from rest_framework.authtoken.admin import TokenAdmin
+from rest_framework.authtoken.models import Token, TokenProxy
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.models import User, Group
+
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+from unfold.admin import ModelAdmin
 
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
 from service.models import Recipient, Template, Campaign
 from service.models.merchant import Merchant
+
+
+from django_celery_beat.models import (
+    ClockedSchedule,
+    CrontabSchedule,
+    IntervalSchedule,
+    PeriodicTask,
+    SolarSchedule,
+)
+from django_celery_beat.admin import PeriodicTaskAdmin as BasePeriodicTaskAdmin
+from django_celery_beat.admin import PeriodicTaskForm, TaskSelectWidget
+
+admin.site.unregister(PeriodicTask)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(SolarSchedule)
+admin.site.unregister(ClockedSchedule)
+admin.site.unregister(TokenProxy)
 
 
 @admin.register(Recipient)
@@ -42,34 +68,16 @@ class CampaignAdmin(ModelAdmin):
             obj.schedule_task()
 
     @admin.action(description="Send Now")
-    def send_now(self, request, queryset):
+    def send_now(self, _, queryset):
         for campaign in queryset:
             campaign.trigger_immediate()
 
     @admin.action(description="Cancel Scheduled Task")
-    def cancel_schedule(self, request, queryset):
+    def cancel_schedule(self, _, queryset):
         for campaign in queryset:
             campaign.cancel_scheduled_task()
             campaign.status = "cancelled"
             campaign.save()
-
-
-from django_celery_beat.models import (
-    ClockedSchedule,
-    CrontabSchedule,
-    IntervalSchedule,
-    PeriodicTask,
-    SolarSchedule,
-)
-from django_celery_beat.admin import PeriodicTaskAdmin as BasePeriodicTaskAdmin
-from django_celery_beat.admin import PeriodicTaskForm, TaskSelectWidget
-
-admin.site.unregister(PeriodicTask)
-admin.site.unregister(IntervalSchedule)
-admin.site.unregister(CrontabSchedule)
-admin.site.unregister(SolarSchedule)
-admin.site.unregister(ClockedSchedule)
-admin.site.unregister(TokenProxy)
 
 
 class UnfoldTaskSelectWidget(UnfoldAdminSelectWidget, TaskSelectWidget):
@@ -88,18 +96,9 @@ class PeriodicTaskAdmin(BasePeriodicTaskAdmin, ModelAdmin):
     form = UnfoldPeriodicTaskForm
 
 
-
 @admin.register(Token)
-class TokenProxyAdmin(TokenAdmin,ModelAdmin):
+class TokenProxyAdmin(TokenAdmin, ModelAdmin):
     pass
-
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
-from django.contrib.auth.models import User, Group
-
-from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
-from unfold.admin import ModelAdmin
 
 
 admin.site.unregister(User)
