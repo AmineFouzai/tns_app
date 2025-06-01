@@ -28,16 +28,3 @@ class WhatsAppSender:
             print(f"Failed to send WhatsApp message: {e}")
             return None
 
-
-# whatsapp = WhatsAppSender(
-#     account_sid='your_twilio_sid',
-#     auth_token='your_twilio_auth_token',
-#     from_whatsapp_number='whatsapp:+14155238886'  # Twilio Sandbox number or your registered WhatsApp number
-# )
-
-# message_sid = whatsapp.send_message(
-#     to_whatsapp_number='whatsapp:+1234567890',
-#     body='Hello from Django via WhatsApp!'
-# )
-
-# print(f"Message SID: {message_sid}")
